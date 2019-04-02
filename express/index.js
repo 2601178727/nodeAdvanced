@@ -3,7 +3,7 @@ const url = require('url');
 
 function createApplication () {
   let app = function (req, res) {
-    const { pathname } = url.parse(req.url, true);
+    const { pathname } = url.parse(req.url, true); // 拿到路径
     for(let i = 0; i < app.routes.length; i++) {
       let route = app.routes[i];
       if (route.method == req.method.toLowerCase() &&
@@ -18,14 +18,18 @@ function createApplication () {
     server.listen.apply(server, arguments);
   };
   app.routes = []; // 此数组用来保存路由规则
-  app.get = function (path, handler) { // 代表客户端的get请求
-    // 向数组里放置路由对象
-    app.routes.push({
-      method: 'get',
-      path: path,
-      handler: handler
-    });
-  };
+  http.METHODS.forEach(function(method) { // 循环请求方式数组
+    method = method.toLocaleLowerCase();
+    app[method] = function (path, handler) { // 代表客户端的请求
+      // 向数组里放置路由对象
+      app.routes.push({
+        method: method,
+        path: path,
+        handler: handler
+      });
+    };
+  });
+  
   return app;
 }
 
